@@ -139,8 +139,8 @@ def populate_recycling(conn):
 
     # 2. Adatgenerálás (Batch)
     recycling_records = []
-    # Az event_type a sémában 'succes', 'error', 'warning'
-    event_types = ['succes', 'error', 'warning'] 
+    # Az event_type a sémában 'success', 'error', 'warning'
+    event_types = ['success', 'error', 'warning'] 
     
     # Kezdő dátum (a CHECK kényszer miatt 2025-01-01 és 2025-04-02 között kell lennie)
     # Beállítjuk az intervallumot, hogy ne sérüljön a CHK_event_date kényszer!
