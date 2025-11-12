@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Recycling extends Model
 {
     use HasFactory;
 
-    protected $table = 'recycling';
+    protected $table = 'recycling'; 
 
     public $timestamps = false;
     
@@ -18,7 +20,7 @@ class Recycling extends Model
 
     public function machine(): BelongsTo
     {
-        return $this->belongsTo(Machine::class, 'machine');
+        return $this->belongsTo(Machine::class, 'machine'); 
     }
 
     public function product(): BelongsTo
