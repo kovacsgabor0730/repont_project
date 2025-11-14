@@ -78,7 +78,7 @@ CREATE TABLE `recycling` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `machine` bigint(20) NOT NULL,
   `product` bigint(20) NOT NULL,
-  `event_type` enum('succes','error','warning') NOT NULL,
+  `event_type` enum('success','error','warning') NOT NULL,
   `event_date` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_recycling_products` (`product`),
