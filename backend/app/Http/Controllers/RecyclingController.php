@@ -13,48 +13,55 @@ class RecyclingController extends Controller
     public function getLeaderboard(Request $request)
     {
         $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'machine_id' => 'nullable|integer',
+            'start_time' => 'required|date_format:Y-m-d H:i:s', 
+            'end_time' => 'required|date_format:Y-m-d H:i:s|after_or_equal:start_time',
+            'machine_id' => 'required|string',
         ]);
 
         $query = Recycling::select(
             'products.product_name',
             DB::raw('COUNT(recycling.id) as total_count')
         )
+        ->whereBetween('recycling.event_date', [$request->start_time, $request->end_time])
         ->where('recycling.event_type', 'success') 
-        ->whereBetween('recycling.event_date', [$request->start_date, $request->end_date])
         ->join('products', 'recycling.product', '=', 'products.id')
         ->groupBy('products.product_name')
         ->orderByDesc('total_count');
 
-        if ($request->filled('machine_id') && $request->input('machine_id') != 0) {
-            $query->where('recycling.machine', $request->machine_id);
+        if ($request->input('machine_id') !== 'all' && is_numeric($request->input('machine_id'))) {
+            $query->where('recycling.machine', (int)$request->input('machine_id'));
         }
 
         $leaderboard = $query->get();
 
         return response()->json($leaderboard);
     }
+    
     public function getEvents(Request $request)
     {
         $request->validate([
-            'start_date' => 'required|date_format:Y-m-d H:i:s', 
-            'end_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:start_date',
-            'product_id' => 'required|integer', 
-            'machine_id' => 'nullable|integer', 
+            'start_time' => 'required|date_format:Y-m-d H:i:s', 
+            'end_time' => 'required|date_format:Y-m-d H:i:s|after_or_equal:start_time',
+            'beverage_type' => 'required|string',
+            'machine_id' => 'required|string', 
         ]);
+        
+        $beverageType = $request->input('beverage_type');
 
-        $start_date = $request->input('start_date');
-        $end_date = $request->input('end_date');
-    
+        $product = Product::where('product_name', $beverageType)->first();
+        
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
         $query = Recycling::with(['product', 'machine'])
-            ->where('product', $request->product_id)
-            ->whereBetween('event_date', [$request->start_date, $request->end_date])
+            ->where('product', $product->id)
+            ->whereBetween('event_date', [$request->start_time, $request->end_time])
+            ->select('id', 'machine', 'product', 'event_type', 'event_date') 
             ->orderBy('event_date', 'desc');
 
-        if ($request->filled('machine_id') && $request->input('machine_id') != 0) {
-            $query->where('machine', $request->machine_id);
+        if ($request->input('machine_id') !== 'all' && is_numeric($request->input('machine_id'))) {
+             $query->where('machine', (int)$request->input('machine_id'));
         }
         
         $events = $query->paginate(50);
@@ -66,7 +73,7 @@ class RecyclingController extends Controller
     {
         $machines = Machine::all(['id', 'name']);
         
-        $machines->prepend(['id' => 0, 'name' => 'Összes automata']);
+        $machines->prepend(['id' => 'all', 'name' => 'Összes automata']); 
 
         return response()->json($machines);
     }
