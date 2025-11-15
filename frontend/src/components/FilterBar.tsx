@@ -2,27 +2,22 @@ import React, { useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { setMachine, setTimeInterval } from '../store/dashboardSlice';
 
-// --- DÁTUM KONVERZIÓS SEGÉDFÜGGVÉNYEK ---
+// --- SEGÉDFÜGGVÉNYEK ---
 
-/**
- * Konvertálja a Backend formátumot (YYYY-MM-DD HH:MM:SS) a HTML input formátumra (YYYY-MM-DDTHH:mm) a megjelenítéshez.
- */
 const convertBackendToLocalFormat = (backendTime: string): string => {
     if (!backendTime || backendTime.length < 16) return '';
-    // Kicseréli a szóközből 'T'-re, és levágja a másodpercet
+    // A Redux store (backend formátum) 'YYYY-MM-DD HH:MM:SS'
+    // A HTML input 'YYYY-MM-DDTHH:MM' formátumot vár
     return backendTime.substring(0, 16).replace(' ', 'T');
 };
 
-/**
- * Konvertálja a HTML input formátumot (YYYY-MM-DDTHH:mm) a Backend formátumra (YYYY-MM-DD HH:MM:SS) a Reduxba mentés előtt.
- */
 const convertLocalToBackendFormat = (localTime: string): string => {
     if (!localTime) return '';
-    // Kicseréli a 'T'-t szóközre, és hozzáadja a másodperceket (:00)
+    // Visszaalakítás a Redux store/Backend által várt 'YYYY-MM-DD HH:MM:00' formátumra
     return localTime.replace('T', ' ') + ':00';
 };
 
-// --- INTERFÉSZEK ÉS KOMPONENS ---
+// --- INTERFÉSZEK ---
 
 interface Machine {
     id: string;
@@ -33,12 +28,14 @@ interface FilterBarProps {
     machines: Machine[];
 }
 
+// --- KOMPONENS ---
+
 const FilterBar: React.FC<FilterBarProps> = ({ machines }) => {
     const dispatch = useAppDispatch();
 
     const { selectedMachineId, startTime, endTime } = useAppSelector(state => state.dashboard);
 
-    // Dátumok konvertálása a Reduxból érkező (backend) formátumról a HTML input (local) formátumra.
+    // Dátum konvertálása HTML input számára
     const localStartTime = useMemo(() => convertBackendToLocalFormat(startTime), [startTime]);
     const localEndTime = useMemo(() => convertBackendToLocalFormat(endTime), [endTime]);
 
@@ -47,14 +44,20 @@ const FilterBar: React.FC<FilterBarProps> = ({ machines }) => {
     };
 
     const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // A kapott HTML input értéket konvertáljuk vissza a backend formátumára mentés előtt
         const newBackendTime = convertLocalToBackendFormat(e.target.value);
-        dispatch(setTimeInterval({ start: newBackendTime, end: endTime }));
+
+        // 1. Validáció: Ha az új start_time későbbi, mint a jelenlegi end_time,
+        // akkor az end_time-ot is hozzá kell igazítani (a start_time-hoz)
+        if (newBackendTime > endTime) {
+            dispatch(setTimeInterval({ start: newBackendTime, end: newBackendTime }));
+        } else {
+            dispatch(setTimeInterval({ start: newBackendTime, end: endTime }));
+        }
     };
 
     const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // A kapott HTML input értéket konvertáljuk vissza a backend formátumára mentés előtt
         const newBackendTime = convertLocalToBackendFormat(e.target.value);
+        // Itt nem kell ellenőriznünk, mert a HTML 'min' attribútuma gondoskodik a böngésző szintű validációról
         dispatch(setTimeInterval({ start: startTime, end: newBackendTime }));
     };
 
@@ -63,7 +66,6 @@ const FilterBar: React.FC<FilterBarProps> = ({ machines }) => {
             <h3 style={{ color: '#007bff', marginBottom: 15, borderBottom: '1px solid #007bff20', paddingBottom: 10 }}>Szűrők</h3>
             <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
 
-                {/* Automata választó */}
                 <div style={inputGroupStyle}>
                     <label style={labelStyle}>Automaták:</label>
                     <select
@@ -71,7 +73,6 @@ const FilterBar: React.FC<FilterBarProps> = ({ machines }) => {
                         onChange={handleMachineChange}
                         style={inputStyle}
                     >
-                        {/* Hozzáadva az "Összes" opció, ha a Redux is kezeli */}
                         {machines.map((machine) => (
                             <option key={machine.id} value={machine.id}>
                                 {machine.name}
@@ -80,33 +81,45 @@ const FilterBar: React.FC<FilterBarProps> = ({ machines }) => {
                     </select>
                 </div>
 
-                {/* Kezdő Dátum/Idő Picker (DateTimePicker) */}
                 <div style={inputGroupStyle}>
                     <label style={labelStyle}>Kezdő időpont:</label>
                     <input
                         type="datetime-local"
-                        value={localStartTime} // local formátum megjelenítése
-                        onChange={handleStartTimeChange} // local formátum kezelése, majd konvertálása Reduxba
+                        value={localStartTime}
+                        onChange={handleStartTimeChange}
                         style={inputStyle}
+                    // Megjegyzés: A min attribútum itt nem szükséges, de lehetne
+                    // max={localEndTime} ha korlátoznánk a jövőbeli kezdő időpontokat
                     />
                 </div>
 
-                {/* Vég Dátum/Idő Picker (DateTimePicker) */}
                 <div style={inputGroupStyle}>
                     <label style={labelStyle}>Vég időpont:</label>
                     <input
                         type="datetime-local"
-                        value={localEndTime} // local formátum megjelenítése
-                        onChange={handleEndTimeChange} // local formátum kezelése, majd konvertálása Reduxba
+                        value={localEndTime}
+                        onChange={handleEndTimeChange}
                         style={inputStyle}
+                        // 💡 JAVÍTÁS: Beállítjuk a min attribútumot a kezdő időpont értékére!
+                        // Ez megakadályozza, hogy a böngészőben korábbi időpontot válasszanak.
+                        min={localStartTime}
                     />
                 </div>
+
+                {/* Opcionális: Szöveges ellenőrzés hozzáadása, ha a felhasználó megkerüli a min attribútumot vagy JS-ben akarod kezelni a validációt. */}
+                {localEndTime < localStartTime && (
+                    <p style={{ color: '#dc3545', marginTop: 5, fontSize: '0.9em' }}>
+                        A vég időpont nem lehet korábbi, mint a kezdő időpont!
+                    </p>
+                )}
+
             </div>
         </div>
     );
 };
 
-// --- STÍLUSOK ---
+// --- STÍLUSOK (megtartva) ---
+
 const inputGroupStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
