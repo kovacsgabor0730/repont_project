@@ -1,0 +1,75 @@
+.events-container {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+}
+
+.events-header {
+    font-weight: bold;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.events-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.events-table thead tr {
+    background-color: #f2f2f2;
+}
+
+.events-table th {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    background-color: #e9ecef;
+}
+
+.events-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.events-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.pagination-container {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.pagination-button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pagination-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.event-success {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.event-error {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.event-warning {
+    color: #ffc107;
+    font-weight: bold;
+}

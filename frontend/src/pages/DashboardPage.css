@@ -1,0 +1,34 @@
+.dashboard-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.dashboard-divider {
+    margin: 30px 0;
+}
+
+.dashboard-section {
+    margin-bottom: 40px;
+}
+
+.dashboard-loading {
+    padding: 20px;
+}
+
+.dashboard-error {
+    padding: 20px;
+    color: red;
+}
+
+.dashboard-hint {
+    text-align: center;
+    color: #666;
+}

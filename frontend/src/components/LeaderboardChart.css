@@ -1,0 +1,23 @@
+.leaderboard-container {
+    height: 400px;
+    width: 100%;
+}
+
+.loading {
+    padding: 20px;
+    text-align: center;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.no-data {
+    padding: 20px;
+    text-align: center;
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.selected {
+    margin-top: 10px;
+    font-weight: bold;
+}

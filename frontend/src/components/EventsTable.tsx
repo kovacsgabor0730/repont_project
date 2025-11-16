@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../hooks';
 import api from '../api/axiosClient';
+import './EventsTable.css';
 
 const formatEventDate = (isoString: string): string => {
     if (!isoString) return '';
@@ -88,19 +89,6 @@ const EventsTable: React.FC = () => {
 
     }, [selectedMachineId, startTime, endTime, selectedBeverageType, currentPage]);
 
-    const getEventTypeColor = (type: string) => {
-        switch (type) {
-            case 'success':
-                return '#28a745';
-            case 'error':
-                return '#dc3545';
-            case 'warning':
-                return '#ffc107';
-            default:
-                return '#333';
-        }
-    };
-
     const getMachineName = (machine: string | MachineData): string => {
         if (typeof machine === 'object' && machine !== null && 'name' in machine) {
             return machine.name;
@@ -109,58 +97,65 @@ const EventsTable: React.FC = () => {
     };
 
     if (!selectedBeverageType) {
-        return <p style={{ textAlign: 'center', color: '#999', padding: '20px 0' }}>Kattints egy üdítőre a Leaderboard-on a részletes események megtekintéséhez.</p>;
+        return (
+            <p className="events-no-selection">
+                Kattints egy üdítőre a Leaderboard-on a részletes események megtekintéséhez.
+            </p>
+        );
     }
 
-    if (isLoading) return <div style={{ textAlign: 'center', padding: '20px 0' }}>Részletes események betöltése...</div>;
+    if (isLoading) {
+        return <div className="events-loading">Részletes események betöltése...</div>;
+    }
 
     return (
-        <div style={{ padding: 10, borderRadius: 8, border: '1px solid #ddd', backgroundColor: '#fff' }}>
-            <p style={{ fontWeight: 'bold', borderBottom: '1px solid #eee', paddingBottom: 10 }}>
-                Események a szűrők alapján. Összesen: **{events.length}** db (aktuális oldalon)
+        <div className="events-container">
+            <p className="events-header">
+                Események a szűrők alapján. Összesen: <strong>{events.length}</strong> db (aktuális oldalon)
             </p>
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 10 }}>
+
+            <table className="events-table">
                 <thead>
-                    <tr style={{ backgroundColor: '#f2f2f2' }}>
-                        <th style={tableHeaderStyle}>ID</th>
-                        <th style={tableHeaderStyle}>Gép</th>
-                        <th style={tableHeaderStyle}>Üdítő</th>
-                        <th style={tableHeaderStyle}>Esemény Típusa</th>
-                        <th style={tableHeaderStyle}>Időpont</th>
+                    <tr>
+                        <th>ID</th>
+                        <th>Gép</th>
+                        <th>Üdítő</th>
+                        <th>Esemény Típusa</th>
+                        <th>Időpont</th>
                     </tr>
                 </thead>
                 <tbody>
                     {events.map((event) => (
-                        <tr key={event.id} style={{ transition: 'background-color 0.1s', ':hover': { backgroundColor: '#f9f9f9' } as React.CSSProperties }}>
-                            <td style={tableCellStyle}>{event.id}</td>
-                            <td style={tableCellStyle}>{getMachineName(event.machine)}</td>
-                            <td style={tableCellStyle}>{event.product_name}</td>
-                            <td style={{ ...tableCellStyle, color: getEventTypeColor(event.event_type), fontWeight: 'bold' }}>
+                        <tr key={event.id}>
+                            <td>{event.id}</td>
+                            <td>{getMachineName(event.machine)}</td>
+                            <td>{event.product_name}</td>
+                            <td className={`event-${event.event_type}`}>
                                 {event.event_type.toUpperCase()}
                             </td>
-                            <td style={tableCellStyle}>
-                                {formatEventDate(event.event_date)}
-                            </td>
+                            <td>{formatEventDate(event.event_date)}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-            <div style={{ marginTop: 15, textAlign: 'center' }}>
+            <div className="pagination-container">
                 <button
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1 || isLoading}
-                    style={paginationButtonStyle(currentPage === 1 || isLoading)}
+                    className="pagination-button"
                 >
                     &lt; Előző
                 </button>
-                <span style={{ margin: '0 10px', fontSize: '0.9em' }}>
+
+                <span className="pagination-info">
                     {currentPage} / {lastPage}
                 </span>
+
                 <button
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === lastPage || isLoading}
-                    style={paginationButtonStyle(currentPage === lastPage || isLoading)}
+                    className="pagination-button"
                 >
                     Következő &gt;
                 </button>
@@ -168,18 +163,5 @@ const EventsTable: React.FC = () => {
         </div>
     );
 };
-
-const tableHeaderStyle: React.CSSProperties = { border: '1px solid #ddd', padding: 10, textAlign: 'left', backgroundColor: '#e9ecef' };
-const tableCellStyle: React.CSSProperties = { border: '1px solid #ddd', padding: 8, textAlign: 'left' };
-const paginationButtonStyle = (disabled: boolean): React.CSSProperties => ({
-    padding: '5px 10px',
-    margin: '0 5px',
-    backgroundColor: disabled ? '#ccc' : '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: 4,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    transition: 'background-color 0.2s',
-});
 
 export default EventsTable;
