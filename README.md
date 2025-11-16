@@ -53,14 +53,16 @@ Klónozd a tárolót a helyi gépedre, majd telepítsd a függőségeket a backe
 
 ## 3. Adatbázis és Logimporter Beállítása
 
-1.  Győződj meg róla, hogy a MySQL fut.
-2.  Állítsd be az adatbázis hozzáférést a Laravel `.env` fájlban (`DB_DATABASE=repont`).
-3.  Futtasd a migrációkat a táblák létrehozásához:
+1.  Hozd létre az adatbázist `repont` néven.
+2.  Importáld a repont_export.sql-t 
+3.  Győződj meg róla, hogy a MySQL fut.
+4.  Állítsd be az adatbázis hozzáférést a Laravel `.env` fájlban (`DB_DATABASE=repont`).
+5.  Futtasd a migrációkat a táblák létrehozásához:
     ```bash
     # A Laravel gyökérkönyvtárban:
     php artisan migrate --seed
     ```
-4.  **Log Importer Szerviz:**
+6.  **Log Importer Szerviz:**
     * Szerkeszd a `log_importer_service.py` fájlban a `DB_CONFIG` részt a saját MySQL jelszavaddal.
     * A logfájlokat (`products.log`, `recycling.log`) a Python szkripttel azonos mappába helyezd.
 
