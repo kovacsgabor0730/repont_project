@@ -107,19 +107,15 @@ Keresd meg a **`httpd-vhosts.conf`** fájlt (pl. `C:\xampp\apache\conf\extra\htt
 ```apache
 <VirtualHost *:80>
     ServerName localhost
-    # Bármely gyökérkönyvtár jó, mivel minden átmegy a proxyn
     DocumentRoot "C:/xampp/htdocs" 
 
     RewriteEngine On
 
-    # --- 1. API PROXY: Továbbítás a Laravel 8000-es portjára
-    # Minden, ami /api/ kezdetű, a Laravel API-nak szól.
     ProxyPass /api/ http://localhost:8000/api/
     ProxyPassReverse /api/ http://localhost:8000/api/
     
-    # --- 2. FRONTEND PROXY: Minden más kérés a React 3000-es portjára megy.
-    ProxyPass / http://localhost:3000/
-    ProxyPassReverse / http://localhost:3000/
+    ProxyPass / http://localhost:5173/
+    ProxyPassReverse / http://localhost:5173/
 
 </VirtualHost>
 ```
