@@ -89,7 +89,13 @@ const LeaderboardChart: React.FC = () => {
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="product_name" />
+                    <XAxis dataKey="product_name"
+                        interval={0}
+                        angle={-45}
+                        textAnchor="end"
+                        height={110}
+                        tick={{ fontSize: 12, fill: '#333' }}
+                    />
                     <YAxis
                         dataKey="total_count"
                         label={{
@@ -97,13 +103,18 @@ const LeaderboardChart: React.FC = () => {
                             angle: -90,
                             position: 'insideLeft',
                         }}
+                        tick={{ fontSize: 12, fill: '#333' }}
                     />
                     <Tooltip formatter={(value: number) => [value, 'Visszavitt darab']} />
-                    <Legend />
+                    <Legend
+                        verticalAlign="top"
+                        wrapperStyle={{ marginBottom: 20 }}
+                    />
                     <Bar
                         dataKey="total_count"
                         name="Visszavitt mennyiség"
                         onClick={handleBarClick}
+                        barSize={50}
                     >
                         {data.map((entry) => (
                             <Cell

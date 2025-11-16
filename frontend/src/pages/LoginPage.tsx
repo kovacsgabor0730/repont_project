@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
 
     return (
         <div className="login-container">
-            <h2>Bejelentkezés 🔐</h2>
+            <h2>Bejelentkezés</h2>
             <form onSubmit={handleSubmit} className="login-form">
                 {error && <p className="login-error">{error}</p>}
 

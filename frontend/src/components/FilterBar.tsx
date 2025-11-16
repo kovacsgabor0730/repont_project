@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { setMachine, setTimeInterval } from '../store/dashboardSlice';
 import './FilterBar.css';
@@ -26,7 +26,10 @@ const FilterBar: React.FC<FilterBarProps> = ({ machines }) => {
     const dispatch = useAppDispatch();
     const { selectedMachineId, startTime, endTime } = useAppSelector(state => state.dashboard);
 
-    const localStartTime = useMemo(() => convertBackendToLocalFormat(startTime), [startTime]);
+    const localStartTime = useMemo(() => {
+        return convertBackendToLocalFormat(startTime);
+    }, [startTime]);
+
     const localEndTime = useMemo(() => convertBackendToLocalFormat(endTime), [endTime]);
 
     const handleMachineChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -47,6 +50,8 @@ const FilterBar: React.FC<FilterBarProps> = ({ machines }) => {
         const newBackendTime = convertLocalToBackendFormat(e.target.value);
         dispatch(setTimeInterval({ start: startTime, end: newBackendTime }));
     };
+
+    const isError = localEndTime && localStartTime && localEndTime < localStartTime;
 
     return (
         <div className="filterbar-container">
@@ -90,7 +95,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ machines }) => {
                     />
                 </div>
 
-                {localEndTime < localStartTime && (
+                {isError && (
                     <p className="filterbar-error">
                         A vég időpont nem lehet korábbi, mint a kezdő időpont!
                     </p>

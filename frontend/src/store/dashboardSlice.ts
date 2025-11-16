@@ -9,7 +9,7 @@ interface DashboardState {
 }
 
 const now = new Date();
-const yesterday = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+// A tegnapi dátum már nem releváns a fix kezdő dátum miatt.
 
 const formatTime = (date: Date): string => {
     const year = date.getFullYear();
@@ -22,9 +22,11 @@ const formatTime = (date: Date): string => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
+const FIXED_DEFAULT_START = '2025-01-01 00:00:00';
+
 const initialState: DashboardState = {
     selectedMachineId: 'all',
-    startTime: formatTime(yesterday),
+    startTime: FIXED_DEFAULT_START,
     endTime: formatTime(now),
     selectedBeverageType: null,
 };

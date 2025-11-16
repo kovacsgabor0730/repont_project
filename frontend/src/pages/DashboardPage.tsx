@@ -7,6 +7,7 @@ import FilterBar from '../components/FilterBar';
 import LeaderboardChart from '../components/LeaderboardChart';
 import EventsTable from '../components/EventsTable';
 import LogoutButton from '../components/LogoutButton';
+import BoschLogo from '../assets/logo.png';
 
 import './DashboardPage.css';
 
@@ -46,7 +47,12 @@ const DashboardPage: React.FC = () => {
     return (
         <div className="dashboard-container">
             <div className="dashboard-header">
-                <h1>RePont Dashboard</h1>
+                <h1>Repont Dashboard</h1>
+                <img
+                    src={BoschLogo}
+                    alt="Bosch Logó"
+                    className="h-12 w-auto object-contain mb-1"
+                />
                 <LogoutButton />
             </div>
 

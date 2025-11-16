@@ -21,3 +21,9 @@
     margin-top: 10px;
     font-weight: bold;
 }
+
+.recharts-cartesian-axis-ticks text {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
