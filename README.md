@@ -54,7 +54,7 @@ Klónozd a tárolót a helyi gépedre, majd telepítsd a függőségeket a backe
 ## 3. Adatbázis és Logimporter Beállítása
 
 1.  Hozd létre az adatbázist `repont` néven.
-2.  Importáld a repont_export.sql-t 
+2.  Importáld a `repont_export.sql`-t 
 3.  Győződj meg róla, hogy a MySQL fut.
 4.  Állítsd be az adatbázis hozzáférést a Laravel `.env` fájlban (`DB_DATABASE=repont`).
 5.  Futtasd a migrációkat a táblák létrehozásához:
